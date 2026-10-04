@@ -18,6 +18,7 @@ public class Main {
 			System.out.println("5. List Akun");
 			System.out.println("6. Ganti Akun");
 			System.out.println("7. Cetak Mutasi (Riwayat)");
+			System.out.println("8. Simulasi Akhir Bulan (Khusus Rekening Tabungan)");
 			System.out.println("0. Keluar");
 			System.out.print("Pilih menu:");
 			
@@ -30,13 +31,31 @@ public class Main {
 				String no = input.nextLine();
 				System.out.println("Masukkan Nama Pemilik: ");
 				String nama = input.nextLine();
+				System.out.println("Masukkan PIN Awal (6 digit): ");
+				String pin = input.nextLine();
 				System.out.println("Masukkan Saldo Awal: ");
 				double saldo = input.nextDouble();
-				//Instalasi objek / Menjalankan constructor
-				akunAktif = new Rekening(no,nama,saldo);
-				DaftarRekening.add(akunAktif);
+				System.out.println("Pilih Produk:\n"+
+									"1. Tabungan Umum  \n" +
+								    "2. Giro Bisnis ");
+				int pilihanJenisTabungan = input.nextInt();
+				if(pilihanJenisTabungan == 1) {
+					System.out.print("Masukkan Nominal Suku Bunga: ");
+					int sukuBunga = input.nextInt();
+					akunAktif = new RekeningTabungan(no,nama,saldo, pin, sukuBunga);
+					DaftarRekening.add(akunAktif);
+				}
+				else if(pilihanJenisTabungan == 2) {
+					System.out.print("Masukkan Nominal Batas Overdraft: ");
+					int batasOverdraft= input.nextInt();
+					akunAktif = new RekeningGiro(no,nama,saldo, pin, batasOverdraft);
+					DaftarRekening.add(akunAktif);
+				}
+				else {
+					System.out.println("Pilihan Tidak Sah!");
+				}
 				break;
-				
+	
 			case 2:
 				if(akunAktif == null) System.out.println("Error: Mohon maaf, Anda belum memiliki nomor rekening");
 				else {
@@ -45,16 +64,23 @@ public class Main {
 					akunAktif.setorTunai(setor);
 				}
 				break;
-				
+	
 			case 3:
 			    if(akunAktif == null) System.out.println("Error: Mohon maaf, Anda belum memiliki nomor rekening");
 			    else {
+			    	System.out.println("Masukkan PIN: ");
+			    	String cekPin = input.nextLine();
+			    	if(akunAktif.otentikasi(cekPin)){
 			        System.out.print("Masukkan nominal penarikan tunai: ");
 			        double tarik = input.nextDouble();
 			        
 			        if(tarik < 10000) System.out.println("Minimal nominal penarikan adalah Rp10.000");
 			        else akunAktif.tarikTunai(tarik);
 			    }
+			    else {
+			    	System.out.println("Akses Ditolak: PIN yang Anda masukkan salah!");
+			    }
+			  }
 			    break;
 			    
 			case 4:
@@ -67,8 +93,8 @@ public class Main {
 			    else {
 			        int i = 1;
 			        for(Rekening x: DaftarRekening) {
-			            System.out.println(i + ". Pemilik: " + x.namaPemilik + 
-			            						", Nomor Rekening: " + x.nomorRekening);
+			            System.out.println(i + ". Pemilik: " + x.getNamaPemilik()+ 
+			            						", Nomor Rekening: " + x.getNomorRekening());
 			            i++;
 			        }
 			    }
@@ -79,7 +105,7 @@ public class Main {
 				else {
 					System.out.println("Pilih indeks nama yang diinginkan: ");
 					for(int i=1; i<=DaftarRekening.size(); i++) {
-						System.out.println(i + ". " + DaftarRekening.get(i-1).namaPemilik);;
+						System.out.println(i + ". " + DaftarRekening.get(i-1).getNamaPemilik());;
 					}
 					int pilihNama = input.nextInt();
 					if(pilihNama > DaftarRekening.size() || pilihNama <=0) {
@@ -87,17 +113,27 @@ public class Main {
 						break;
 					}
 					akunAktif = DaftarRekening.get(pilihNama-1);
-					System.out.println("Akun dialihan menjadi milik " + akunAktif.namaPemilik);
+					System.out.println("Akun dialihan menjadi milik " + akunAktif.getNamaPemilik());
 					break;
 				}
 				break;
 			case 7:
 				if(akunAktif.riwayatTransaksi.isEmpty()) System.out.println("Belum ada transaksi pada rekening ini");
 				else {
+					System.out.print("Masukkan PIN: ");
+					String cekPin = input.nextLine();
+					if(akunAktif.otentikasi(cekPin));
 					akunAktif.cetakMutasi();
 				}
+				break; 
+			case 8:
+				if(akunAktif instanceof RekeningTabungan) {
+					((RekeningTabungan) akunAktif).tambahBungaAkhirBulan();
+				}
+				else {
+					System.out.println("Gagal: Fitur bunga akhir bulan hanya berlaku untuk Rekening Tabungan.");
+				}
 				break;
-			
 			case 0:
 				int lastIndex = akunAktif.riwayatTransaksi.size();
 				System.out.println(lastIndex);
