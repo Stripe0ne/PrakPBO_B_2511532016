@@ -2,21 +2,36 @@ package pekan1;
 import java.util.*;
 public class Rekening {
 
-	String nomorRekening;
-	String namaPemilik;
-	double saldo, totalSetor=0, totalTarik=0;
+	private String nomorRekening;
+	private String namaPemilik;
+	private String pin;
 	
-	ArrayList<Transaksi> riwayatTransaksi;
 	
-	public Rekening(String nomor, String nama, double saldoAwal) {
+	protected double saldo;
+	protected ArrayList<Transaksi> riwayatTransaksi;
+	
+	public Rekening(String nomor, String nama, double saldoAwal, String pinAwal) {
 		if(saldoAwal <0) System.out.println("Saldo tidak bisa bernilai negatif!");
 		this.nomorRekening = nomor;
 		this.namaPemilik = nama;
 		this.saldo = saldoAwal;
 		
+		if(pinAwal.length() == 6) { 
+			this.pin=pinAwal;}
+		else {
+			System.out.println("Peringatan: PIN harus 6 digit! Menggunakan PIN default 123456");
+			this.pin = "123456";
+		}
+		
 		this.riwayatTransaksi = new ArrayList<>();
 		System.out.println("Rekening atas nama " + namaPemilik +
 							" berhasil dibuat dengan saldo Rp" + saldo);
+	}
+	public String getNomorRekening() { return nomorRekening;}
+	public String getNamaPemilik() { return namaPemilik;}
+	
+	public boolean otentikasi(String inputPin) {
+		return this.pin.equals(inputPin);
 	}
 	
 	public void setorTunai(double nominal) {
