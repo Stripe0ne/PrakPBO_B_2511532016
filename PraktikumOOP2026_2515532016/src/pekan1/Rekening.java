@@ -6,7 +6,6 @@ public class Rekening {
 	private String namaPemilik;
 	private String pin;
 	
-	
 	protected double saldo;
 	protected ArrayList<Transaksi> riwayatTransaksi;
 	
@@ -30,39 +29,64 @@ public class Rekening {
 	public String getNomorRekening() { return nomorRekening;}
 	public String getNamaPemilik() { return namaPemilik;}
 	
-	public boolean otentikasi(String inputPin) {
-		return this.pin.equals(inputPin);
-	}
-	
 	public void setorTunai(double nominal) {
 		if(nominal>0) {
 			saldo+=nominal;
 			String idTrx = "TRX-S-" + System.currentTimeMillis();
 			Transaksi trxBaru = new Transaksi(idTrx, "Kredit", nominal);
 			riwayatTransaksi.add(trxBaru);
-			System.out.println("Setor tunai Rp" + nominal +	" berhasil. Saldo saat ini: Rp" + saldo);
+			System.out.println("Setor tunai Rp" + nominal +	" berhasil. Saldo akun " + this.namaPemilik + " saat ini: Rp" + saldo + "\n");
 			
 		}
 		else {
 			System.out.println("Gagal: Nominal setor harus lebih dari 0!");
 		}
 	}
-	public void tarikTunai(double nominal) {
+	public boolean tarikTunai(double nominal) {
 	    if(nominal <= 0) {
 	        System.out.println("Gagal: Nominal penarikan harus lebih dari 0!");
-	        return;
+	        return false;
 	    }
-	    if(nominal > saldo) {
+	    else if(nominal > saldo) {
 	        System.out.println("Transaksi Gagal: Saldo tidak mencukupi. Saldo Anda: Rp" + saldo);
-	        return;
+	        return false;
 	    }
+	    else {
 	    saldo -= nominal;
 	    String idTrx = "TRX-T-" + System.currentTimeMillis();
 		Transaksi trxBaru = new Transaksi(idTrx, "Debit", nominal);
 		riwayatTransaksi.add(trxBaru);
-	    System.out.println("Penarikan tunai senilai Rp" + nominal + " berhasil. Saldo saat ini: Rp" + saldo);
+	    System.out.println("Penarikan tunai senilai Rp" + nominal + " berhasil. Saldo akun " + this.namaPemilik + " saat ini: Rp" + saldo + "\n");
+	    
+	    return true;
+	    }
 	}
 	
+
+public void transfer(Rekening tujuan, double nominal, String pinInput) {
+    if (!otentikasi(pinInput)) {
+        System.out.println("PIN yang dimasukkan salah!");
+        return;
+    }
+
+    if (tujuan == this) {
+        System.out.println("Tidak bisa melakukan transfer ke rekening sendiri!");
+        return;
+    }
+
+    if (tarikTunai(nominal)) {
+        tujuan.setorTunai(nominal);
+        System.out.println("Transfer berhasil!");
+    } else {
+        System.out.println("Transfer gagal!");
+    }
+}
+
+
+	public boolean otentikasi(String inputPin) {
+		return this.pin.equals(inputPin);
+	}
+
 	public void cetakMutasi() {
 		int i=1;
 		for(Transaksi x: riwayatTransaksi) {

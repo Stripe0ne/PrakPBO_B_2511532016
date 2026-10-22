@@ -2,30 +2,32 @@ package pekan1;
 import java.util.*;
 public class Main {
 	
+	private static ArrayList<Rekening> DaftarRekening = new ArrayList<Rekening>(); 
+	private static Rekening akunAktif = null;
+	
  	public static void main(String[] args) {
-		ArrayList<Rekening> DaftarRekening = new ArrayList<Rekening>(); 
 		Scanner input = new Scanner(System.in);
-		Rekening akunAktif = null;
 		boolean isRunning = true;
-		
+		isiDaftar();
 		System.out.println("=== SISTEM PERBANKAN MINI ===");
 		while(isRunning) {
 			System.out.println("\nMenu Utama:");
 			System.out.println("1. Buka Rekening Baru");
-			System.out.println("2. Setor Tunai");
-			System.out.println("3. Tarik Tunai");
-			System.out.println("4. Cek Informasi Rekening");
+			System.out.println("2. Setor Tunai");			 	
+			System.out.println("3. Tarik Tunai");			 
+			System.out.println("4. Cek Informasi Rekening"); 
 			System.out.println("5. List Akun");
 			System.out.println("6. Ganti Akun");
 			System.out.println("7. Cetak Mutasi (Riwayat)");
 			System.out.println("8. Simulasi Akhir Bulan (Khusus Rekening Tabungan)");
+			System.out.println("9. Transfer Tunai");
 			System.out.println("0. Keluar");
 			System.out.print("Pilih menu:");
 			
-			int pilihan = input.nextInt();
-			input.nextLine();
+			int pilihan = input.nextInt();input.nextLine();
 			
 			switch(pilihan) {
+			//Buka Rekening Baru
 			case 1:
 				System.out.println("Masukkan No Rekening: ");
 				String no = input.nextLine();
@@ -55,7 +57,8 @@ public class Main {
 					System.out.println("Pilihan Tidak Sah!");
 				}
 				break;
-	
+			
+			//Setor Tunai	
 			case 2:
 				if(akunAktif == null) System.out.println("Error: Mohon maaf, Anda belum memiliki nomor rekening");
 				else {
@@ -64,7 +67,7 @@ public class Main {
 					akunAktif.setorTunai(setor);
 				}
 				break;
-	
+			//Tarik Tunai	
 			case 3:
 			    if(akunAktif == null) System.out.println("Error: Mohon maaf, Anda belum memiliki nomor rekening");
 			    else {
@@ -82,12 +85,13 @@ public class Main {
 			    }
 			  }
 			    break;
-			    
+			//Cek Informasi Rekening    
 			case 4:
 				if(akunAktif == null) System.out.println("Error: Anda belum membuka rekening!");
 				else akunAktif.cekInformasi();
 				break;
 				
+			//List Akun
 			case 5:
 			    if(DaftarRekening.isEmpty()) System.out.println("Tidak ada akun yang terdaftar.");
 			    else {
@@ -99,7 +103,7 @@ public class Main {
 			        }
 			    }
 			    break;
-			    
+			//Ganti Akun    
 			case 6:
 				if(DaftarRekening.isEmpty()) System.out.println("Tidak ada akun yang terdaftar.");
 				else {
@@ -117,6 +121,7 @@ public class Main {
 					break;
 				}
 				break;
+			//Cetak Mutasi
 			case 7:
 				if(akunAktif.riwayatTransaksi.isEmpty()) System.out.println("Belum ada transaksi pada rekening ini");
 				else {
@@ -126,6 +131,7 @@ public class Main {
 					akunAktif.cetakMutasi();
 				}
 				break; 
+			//Simulasi Akhir Bulan
 			case 8:
 				if(akunAktif instanceof RekeningTabungan) {
 					((RekeningTabungan) akunAktif).tambahBungaAkhirBulan();
@@ -134,9 +140,32 @@ public class Main {
 					System.out.println("Gagal: Fitur bunga akhir bulan hanya berlaku untuk Rekening Tabungan.");
 				}
 				break;
+			
+			//Transfer
+			case 9:
+				if(DaftarRekening.isEmpty()) System.out.println("Tidak ada akun yang terdaftar.");
+				else {
+					boolean found = false;
+					System.out.print("Masukkan nomor rekening tujuan: ");
+					String nomorRekeningTujuan = input.nextLine();
+					for(Rekening x: DaftarRekening) {
+						if(nomorRekeningTujuan.equals(x.getNomorRekening())) {
+							found = true;
+							System.out.print("Masukkan nominal yang akan ditransfer: ");
+							double nominal = input.nextDouble(); input.nextLine();
+							
+							System.out.print("Masukkan PIN rekening Anda: ");
+							String inputPIN = input.nextLine();
+							
+							
+							if(akunAktif.otentikasi(inputPIN)) akunAktif.transfer(x, nominal, inputPIN);
+							else System.out.println("PIN yang dimasukkan salah!");
+						}
+					}
+					if(!found) System.out.println("Nomor rekening tidak ditemukan!");
+				}
+				break;
 			case 0:
-				int lastIndex = akunAktif.riwayatTransaksi.size();
-				System.out.println(lastIndex);
 				isRunning = false;
 				System.out.println("Sistem ditutup. Terima kasih!");
 				break;
@@ -145,5 +174,15 @@ public class Main {
 			}
 		}
 		input.close();
+	}
+ 	
+	public static void isiDaftar() {
+		Rekening rek1 = new RekeningTabungan("123", "Suheng", 100000, "123456", 5);
+		Rekening rek2 = new RekeningTabungan("456", "Sugeng", 500000, "123456", 3);
+		Rekening rek3 = new RekeningGiro("789", "Supeng", 1000000, "123456", 500000);
+		DaftarRekening.add(rek1);
+		DaftarRekening.add(rek2);
+		DaftarRekening.add(rek3);
+		akunAktif = rek3;
 	}
 }

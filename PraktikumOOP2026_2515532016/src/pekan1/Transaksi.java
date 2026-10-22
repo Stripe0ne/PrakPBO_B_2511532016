@@ -16,9 +16,9 @@ public class Transaksi {
 	public double getNominal() {return nominal;}
 	
 	public void cetakDetail() {
-		System.out.println("ID: "+ idTransaksi + 
-				" | Jenis: " + jenis +  
-				" | Nominal: Rp" + nominal);
+		System.out.println(	"ID: "+ idTransaksi + 
+							" | Jenis: " + jenis +  
+							" | Nominal: Rp" + nominal);
 	}
 
 }

@@ -13,8 +13,8 @@ public class RekeningTabungan extends Rekening{
 		saldo += nominalBunga;
 		String idTrx = "TRX-B-" + System.currentTimeMillis();
 		riwayatTransaksi.add(new Transaksi(idTrx, "Bunga", nominalBunga));
-		System.out.println("Bunga " + sukuBunga + "% berhasil ditambahkan: Rp " + nominalBunga +
-							". Saldo saat ini: " + saldo);
+		System.out.println("Bunga " + sukuBunga + "% berhasil ditambahkan: Rp" + nominalBunga +
+							". Saldo saat ini: " + saldo + "\n");
 	}
 }
 
